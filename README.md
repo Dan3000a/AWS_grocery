@@ -1,4 +1,4 @@
-## Requirements
+git sta## Requirements
 To make this app work make sure you have this installed on your computer:
 - Python(use `pyenv` to install and manage compatible versions [3.12/3.11])
 - PostgreSQL

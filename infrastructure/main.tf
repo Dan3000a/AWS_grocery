@@ -3,88 +3,43 @@ provider "aws" {
   profile = var.profile
 }
 
-# 🔹 Security Group for Web Server & Database
-resource "aws_security_group" "web_sg" {
-  name        = var.security_group_name
-  description = "Allow HTTP, SSH, and DB access"
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.ssh_cidr
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = var.http_cidr
-  }
-
-  # Allow EC2 to communicate with RDS on port 5432
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    security_groups = [aws_security_group.web_sg.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+module "vpc" {
+  source               = "./modules/vpc"
+  vpc_cidr            = "10.0.0.0/16"
+  public_subnet_cidr  = "10.0.1.0/24"
+  private_subnet_cidr = "10.0.2.0/24"
+  availability_zone   = "eu-central-1a"
 }
 
-# 🔹 EC2 Instance (Web Server)
-resource "aws_instance" "web_server" {
-  ami                  = var.ami
-  instance_type        = var.instance_type
-  key_name             = var.key_pair_name
-  security_groups      = [aws_security_group.web_sg.name]
-  associate_public_ip_address = false  # EC2 is in a private subnet
-
-  tags = {
-    Name = var.instance_name
-  }
-
-  # Install Apache & Allow Web Access
-  user_data = <<-EOF
-              #!/bin/bash
-              yum update -y
-              yum install -y httpd
-              systemctl start httpd
-              systemctl enable httpd
-              echo "Hello, World!" > /var/www/html/index.html
-              EOF
+module "security_groups" {
+  source               = "./modules/security_groups"
+  ssh_cidr            = var.ssh_cidr
+  http_cidr           = var.http_cidr
+  security_group_name = var.security_group_name
 }
 
-# 🔹 RDS PostgreSQL Database
-resource "aws_db_instance" "grocery_db" {
-  allocated_storage    = 20
-  engine              = "postgres"
-  engine_version      = "13.3"
-  instance_class      = "db.t3.micro"
-  username           = var.db_username
-  password           = var.db_password
-  db_subnet_group_name = aws_db_subnet_group.main.name
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
-  publicly_accessible  = false
-  skip_final_snapshot  = true
-
-  tags = {
-    Name = "GroceryMate-DB"
-  }
+module "ec2" {
+  source          = "./modules/ec2"
+  ami            = var.ami
+  instance_type  = var.instance_type
+  key_pair_name  = var.key_pair_name
+  instance_name  = var.instance_name
+  security_group = module.security_groups.security_group_id
 }
 
-# 🔹 Subnet Group for RDS
-resource "aws_db_subnet_group" "main" {
-  name       = "grocery-db-subnet-group"
-  subnet_ids = var.private_subnets
+module "rds" {
+  source         = "./modules/rds"
+  db_username   = var.db_username
+  db_password   = var.db_password
+  private_subnets = module.vpc.private_subnets
+  security_group = module.security_groups.security_group_id
+}
 
-  tags = {
-    Name = "GroceryMate RDS Subnet Group"
-  }
+module "s3" {
+  source = "./modules/s3"
+  bucket_name = "grocerymate-terraform-state"
+}
+
+module "iam" {
+  source = "./modules/iam"
 }

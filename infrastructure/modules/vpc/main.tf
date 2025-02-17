@@ -1,6 +1,7 @@
+# VPC Creation
 resource "aws_vpc" "main_vpc" {
-  cidr_block = var.vpc_cidr
-  enable_dns_support = true
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
@@ -8,28 +9,34 @@ resource "aws_vpc" "main_vpc" {
   }
 }
 
+# Retrieve Availability Zones Dynamically
+data "aws_availability_zones" "available" {}
+
+# Public Subnet
 resource "aws_subnet" "public_subnet" {
-  vpc_id = aws_vpc.main_vpc.id
-  cidr_block = var.public_subnet_cidr
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = var.public_subnet_cidr
   map_public_ip_on_launch = true
-  availability_zone = var.availability_zone
+  availability_zone       = element(data.aws_availability_zones.available.names, 0)
 
   tags = {
     Name = "Public Subnet"
   }
 }
 
+# Private Subnets (Dynamic)
 resource "aws_subnet" "private_subnet" {
-  vpc_id = aws_vpc.main_vpc.id
-  cidr_block = var.private_subnet_cidr
-  availability_zone = var.availability_zone
+  count             = 2
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = cidrsubnet(aws_vpc.main_vpc.cidr_block, 4, count.index)
+  availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
   tags = {
-    Name = "Private Subnet"
+    Name = "Private Subnet ${count.index + 1}"
   }
 }
 
-# Define IGW & Route Table
+# Internet Gateway & Routing (Only for Public)
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main_vpc.id
 
@@ -52,6 +59,15 @@ resource "aws_route_table" "public_rt" {
 }
 
 resource "aws_route_table_association" "public_assoc" {
-  subnet_id = aws_subnet.public_subnet.id
+  subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.public_rt.id
+}
+
+# Outputs
+output "vpc_id" {
+  value = aws_vpc.main_vpc.id
+}
+
+output "private_subnets" {
+  value = aws_subnet.private_subnet[*].id
 }

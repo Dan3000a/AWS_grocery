@@ -39,3 +39,4 @@ infrastructure/aws-auth.sh
 
 # Ignore GroceryMateDocs READMEs
 infrastructure/GroceryMateDocs/
+infrastructure/aws-auth.sh

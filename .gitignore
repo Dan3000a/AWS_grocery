@@ -82,4 +82,5 @@ frontend/src/config.js~
 # ========================
 
 # Ignore all 11 Readme files in GroceryMateDocs/
-infrastructure/GroceryMateDocs/
+infrastructure/GroceryMateDocs/infrastructure/aws-auth.sh
+infrastructure/terraform.tfvars

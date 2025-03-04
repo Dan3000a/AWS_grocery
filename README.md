@@ -156,21 +156,21 @@ npm start
 🔥 Infrastructure Testing
 
 On February 27, 2025, I tested:
-	1.	SSH Access – Secure login to EC2 bastion
-	2.	Database Connectivity – Verified RDS PostgreSQL connections
-	3.	Storage Access – Uploaded & retrieved files from S3
-	4.	Web Availability – Verified website through ALB DNS
-	5.	Auto Scaling – Terminated an instance, ASG replaced it
+- **SSH Access** – Secure login to EC2 bastion 
+- **Database Connectivity** – Verified RDS PostgreSQL connections
+- **Storage Access** – Uploaded & retrieved files from S3
+- **Web Availability** – Verified website through ALB DNS
+- **Auto Scaling** – Terminated an instance, ASG replaced it
 
 ✅ All tests passed successfully!
 
 🤝 Contributing
 
 We welcome contributions! Follow these steps:
-	1.	Fork the repository
-	2.	Create a feature branch: git checkout -b feature/your-feature
-	3.	Implement changes & commit
-	4.	Push & create a Pull Request (PR)
+- **Fork** the repository
+- **Create a feature branch**: git checkout -b feature/your-feature
+- **Implement changes & commit**
+- **Push & create a Pull Request (PR)**
 
 📜 License
 

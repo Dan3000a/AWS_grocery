@@ -1,6 +1,85 @@
+# ========================
+# ✅ Terraform-Specific Ignores
+# ========================
+
+# Ignore local Terraform directories
+infrastructure/.terraform/
+
+# Ignore Terraform state files (critical infrastructure data)
+infrastructure/*.tfstate
+infrastructure/*.tfstate.backup
+
+# Ignore Terraform lock file (prevents parallel deployments)
+infrastructure/.terraform.tfstate.lock.info
+
+# Ignore Terraform crash logs
+infrastructure/crash.log
+infrastructure/crash.*.log
+
+# Ignore Terraform variable files (contains secrets)
+infrastructure/terraform.tfvars
+infrastructure/*.tfvars
+infrastructure/*.tfvars.json
+
+# Ignore Terraform override files (not meant for version control)
+infrastructure/override.tf
+infrastructure/override.tf.json
+infrastructure/*_override.tf
+infrastructure/*_override.tf.json
+
+# Ignore Terraform plan files
+infrastructure/*tfplan*
+
+# Ignore Terraform CLI configuration files
+infrastructure/.terraformrc
+infrastructure/terraform.rc
+
+# ========================
+# ✅ Security & Credentials (Do NOT Push!)
+# ========================
+
+# Ignore sensitive AWS auth files
+infrastructure/aws-auth.sh
+
+# Ignore SSH keys (if accidentally added)
+infrastructure/*.pem
+infrastructure/*.key
+infrastructure/*.pub
+
+# ========================
+# ✅ Ignore Python Virtual Environments
+# ========================
+
+venv/
+
+# ========================
+# ✅ IDE & System-Specific Files
+# ========================
+
+# Ignore macOS system file
+.DS_Store
+
+# Ignore editor swap files
+*.swp
+*.swo
+
+# Ignore VSCode & JetBrains IDE settings
+.vscode/
+.idea/
 .idea/aws.xml
+
+# ========================
+# ✅ Frontend-Specific Ignores
+# ========================
+
+# Ignore temporary frontend files
 frontend/frontend-build.zip
 frontend/temp_extract/
 frontend/src/config.js~
-venv/
-infrastructure/aws-auth.sh
+
+# ========================
+# ✅ Unwanted Documentation Files
+# ========================
+
+# Ignore all 11 Readme files in GroceryMateDocs/
+infrastructure/GroceryMateDocs/

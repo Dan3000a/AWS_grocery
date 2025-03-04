@@ -1,5 +1,41 @@
-.idea/aws.xml
-frontend/frontend-build.zip
-frontend/temp_extract/
-frontend/src/config.js~
-venv/
+# Ignore local Terraform directories
+.terraform/
+
+# Ignore Terraform state files (critical infrastructure data)
+*.tfstate
+*.tfstate.backup
+
+# Ignore Terraform lock file
+.terraform.tfstate.lock.info
+
+# Ignore Terraform plan files
+*tfplan*
+
+# Ignore Terraform override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore Terraform CLI configuration files
+.terraformrc
+terraform.rc
+
+# Ignore sensitive files (SSH keys, secrets)
+*.pem
+*.key
+*.pub
+infrastructure/aws-auth.sh
+
+# Ignore IDE and system files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignore logs
+*.log
+
+# Ignore GroceryMateDocs READMEs
+infrastructure/GroceryMateDocs/

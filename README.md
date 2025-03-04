@@ -114,27 +114,27 @@ git clone https://github.com/Dan3000a/AWS_grocery.git
 cd AWS_grocery
 ```
 
-2️⃣ Deploy Cloud Infrastructure
+### **2️⃣ Deploy Cloud Infrastructure**
 ```bash
 cd infrastructure
 terraform init
 terraform plan
 terraform apply -auto-approve
 ```
-3️⃣ Configure Database
+### **3️⃣ Configure Database**
 ```bash
 psql -U postgres -c "CREATE DATABASE grocerymate_db;"
 psql -U postgres -c "CREATE USER grocery_user WITH ENCRYPTED PASSWORD '<your_secure_password>';"
 psql -U postgres -c "ALTER USER grocery_user WITH SUPERUSER;"
 ```
-4️⃣ Set Up Backend
+### **4️⃣ Set Up Backend**
 ```bash
 cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-5️⃣ Set Environment Variables
+### **5️⃣ Set Environment Variables**
 ```bash
 JWT_SECRET_KEY=<your_secure_key>
 POSTGRES_USER=grocery_user
@@ -143,17 +143,17 @@ POSTGRES_DB=grocerymate_db
 POSTGRES_HOST=localhost
 POSTGRES_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/${POSTGRES_DB}
 ```
-6️⃣ Start the Backend
+### **6️⃣ Start the Backend**
 ```bash
 python3 run.py
 ```
-7️⃣ Deploy the Frontend
+### **7️⃣ Deploy the Frontend**
 ```bash
 cd frontend
 npm install
 npm start
 ```
-🔥 Infrastructure Testing
+### **🔥 Infrastructure Testing**
 
 On February 27, 2025, I tested:
 - **SSH Access** – Secure login to EC2 bastion 
@@ -164,7 +164,7 @@ On February 27, 2025, I tested:
 
 ✅ All tests passed successfully!
 
-🤝 Contributing
+### **🤝 Contributing**
 
 We welcome contributions! Follow these steps:
 - **Fork** the repository
@@ -172,7 +172,7 @@ We welcome contributions! Follow these steps:
 - **Implement changes & commit**
 - **Push & create a Pull Request (PR)**
 
-📜 License
+### **📜 License**
 
 This project is licensed under the MIT License and is free for non-commercial use.
 

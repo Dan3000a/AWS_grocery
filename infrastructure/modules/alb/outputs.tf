@@ -1,3 +1,7 @@
+output "aws_lb_target_group_grocerymate_tg_arn" {
+  value = aws_lb_target_group.grocerymate_tg.arn
+}
+
 output "alb_dns_name" {
   value = aws_lb.grocerymate_alb.dns_name
 }

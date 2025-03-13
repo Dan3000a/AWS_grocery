@@ -77,12 +77,6 @@ variable "launch_template_version" {
   type        = string
 }
 
-# Variable for ALB target group ARN
-variable "target_group_arn" {
-  description = "ARN of the ALB target group"
-  type        = string
-}
-
 variable "db_identifier" {
   description = "The unique identifier for the primary RDS instance"
   type        = string
@@ -102,4 +96,11 @@ variable "db_credentials_secret_name" {
 variable "ami" {
   description = "AMI ID for EC2 instances"
   type        = string
+}
+
+# IAM Instance Profile Name (added for flexibility)
+variable "iam_instance_profile_name" {
+  description = "Name of the IAM instance profile for EC2 instances"
+  type        = string
+  default     = "grocerymate-ec2-profile"  # Matches the hardcoded value in main.tf
 }

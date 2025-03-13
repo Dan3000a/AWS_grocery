@@ -55,13 +55,12 @@ resource "aws_db_instance" "grocery_db" {
 
 # ✅ RDS Read Replica
 resource "aws_db_instance" "grocery_db_replica" {
-  identifier              = "grocerymate-replica"
-  replicate_source_db     = var.db_arn  # ✅ Corrected reference
-  instance_class          = "db.t3.micro"  # Match primary instance class
+  identifier              = "grocerymate-replica-az1a"
+  replicate_source_db     = var.db_identifier  # ✅ Use identifier, not ARN
+  instance_class          = "db.t3.micro"      # Match primary instance class
   allocated_storage       = 20
   engine                  = "postgres"
-  engine_version          = "15.12"        # ✅ Ensure replica matches the primary DB version
-  db_subnet_group_name    = aws_db_subnet_group.grocery_db_subnet.name
+  engine_version          = "15.12"            # ✅ Ensure replica matches the primary DB version
   vpc_security_group_ids  = [var.security_group]
   publicly_accessible     = false
   skip_final_snapshot     = true

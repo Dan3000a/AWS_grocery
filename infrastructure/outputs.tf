@@ -23,3 +23,8 @@ output "validated_ip" {
   description = "The final validated IP used in Terraform."
   value       = var.manual_ip == "auto" ? data.external.my_ip[0].result.ip : var.manual_ip
 }
+
+output "alb_dns_name" {
+  description = "The DNS name of the Application Load Balancer"
+  value       = module.alb.alb_dns_name
+}

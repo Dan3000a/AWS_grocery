@@ -47,4 +47,10 @@ variable "public_subnets" {
 
 variable "bastion_security_group_id" {
   description = "The ID of the Bastion security group"
+  type        = string
+}
+
+variable "iam_instance_profile_name" {
+  description = "Name of the IAM instance profile"
+  type        = string
 }

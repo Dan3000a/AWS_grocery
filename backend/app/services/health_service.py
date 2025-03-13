@@ -2,6 +2,7 @@ from sqlalchemy import text
 from .. import db
 from flask import current_app
 
+
 def perform_health_check() -> dict:
     """
     Performs a health check by checking if the database is reachable.

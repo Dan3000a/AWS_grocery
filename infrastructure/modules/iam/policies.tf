@@ -70,24 +70,7 @@ resource "aws_iam_policy" "cloudwatch_sns_policy" {
   })
 }
 
-# Attach Secrets Manager policy to EC2 role
-resource "aws_iam_role_policy_attachment" "attach_secrets_policy" {
-  role       = aws_iam_role.ec2_secrets_manager_role.name
-  policy_arn = aws_iam_policy.secrets_manager_policy.arn
-}
-
-# Attach Terraform state policy and CloudWatch/SNS policy to Terraform Execution Role
-resource "aws_iam_role_policy_attachment" "attach_terraform_state_policy" {
-  role       = "TerraformExecutionRole"
-  policy_arn = aws_iam_policy.terraform_state_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "attach_cloudwatch_sns_policy" {
-  role       = "TerraformExecutionRole"
-  policy_arn = aws_iam_policy.cloudwatch_sns_policy.arn
-}
-
-# Policy for S3 pre-signed URLs and bucket listing
+# ✅ IAM Policy: Allow S3 Pre-signed URLs and Bucket Listing
 resource "aws_iam_policy" "s3_presigned_url_policy" {
   name        = "S3PresignedUrlPolicy"
   description = "Allows generating pre-signed URLs and listing S3 bucket contents"
@@ -112,8 +95,61 @@ resource "aws_iam_policy" "s3_presigned_url_policy" {
   })
 }
 
-# Attach S3 policy to the correct role (ec2_secrets_manager_role, not ec2_role)
+# ✅ IAM Policy: Allow Access to S3 Avatars Bucket
+resource "aws_iam_policy" "s3_avatars_policy" {
+  name        = "S3AvatarsAccess"
+  description = "Allows access to grocerymate-avatars bucket"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:GetBucketLocation"  # Should be present
+        ]
+        Resource = [
+          "arn:aws:s3:::grocerymate-avatars",
+          "arn:aws:s3:::grocerymate-avatars/*"
+        ]
+      }
+    ]
+  })
+}
+
+# Attach Secrets Manager policy to EC2 role
+resource "aws_iam_role_policy_attachment" "attach_secrets_policy" {
+  role       = aws_iam_role.ec2_secrets_manager_role.name
+  policy_arn = aws_iam_policy.secrets_manager_policy.arn
+}
+
+# Attach S3 Pre-signed URL policy to EC2 role
 resource "aws_iam_role_policy_attachment" "s3_presigned_url_attachment" {
-  role       = aws_iam_role.ec2_secrets_manager_role.name  # Changed from ec2_role
+  role       = aws_iam_role.ec2_secrets_manager_role.name
   policy_arn = aws_iam_policy.s3_presigned_url_policy.arn
+}
+
+# Attach S3 Avatars policy to EC2 role
+resource "aws_iam_role_policy_attachment" "s3_avatars_attachment" {
+  role       = aws_iam_role.ec2_secrets_manager_role.name
+  policy_arn = aws_iam_policy.s3_avatars_policy.arn
+}
+
+# Attach Terraform state policy and CloudWatch/SNS policy to Terraform Execution Role
+resource "aws_iam_role_policy_attachment" "attach_terraform_state_policy" {
+  role       = "TerraformExecutionRole"
+  policy_arn = aws_iam_policy.terraform_state_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_cloudwatch_sns_policy" {
+  role       = "TerraformExecutionRole"
+  policy_arn = aws_iam_policy.cloudwatch_sns_policy.arn
+}
+
+# Attach S3 Avatars policy to Terraform Execution Role
+resource "aws_iam_role_policy_attachment" "attach_s3_avatars_policy" {
+  role       = "TerraformExecutionRole"
+  policy_arn = aws_iam_policy.s3_avatars_policy.arn
 }

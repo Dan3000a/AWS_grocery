@@ -20,6 +20,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   role = aws_iam_role.ec2_secrets_manager_role.name
 }
 
+# ✅ IAM Role for EC2 (general purpose)
 resource "aws_iam_role" "ec2_role" {
   name = "grocerymate-ec2-role"
 
@@ -28,7 +29,9 @@ resource "aws_iam_role" "ec2_role" {
     Statement = [{
       Action = "sts:AssumeRole"
       Effect = "Allow"
-      Principal = { Service = "ec2.amazonaws.com" }
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
     }]
   })
 }

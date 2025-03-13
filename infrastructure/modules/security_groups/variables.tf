@@ -27,3 +27,8 @@ variable "manual_ip" {
   description = "Manual IP for SSH access, or 'auto' for dynamic IP detection"
   type        = string
 }
+
+variable "alb_security_group_id" {
+  description = "Security group ID of the ALB"
+  type        = string
+}

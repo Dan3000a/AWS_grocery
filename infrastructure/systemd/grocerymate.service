@@ -1,0 +1,19 @@
+[Unit]
+Description=GroceryMate Application
+After=network.target
+
+[Service]
+User=ec2-user
+WorkingDirectory=/home/ec2-user/backend
+ExecStart=/home/ec2-user/backend/venv/bin/gunicorn --bind 0.0.0.0:8000 --access-logfile /home/ec2-user/backend/logs/grocerymate.log --error-logfile /home/ec2-user/backend/logs/grocerymate_error.log run:app
+Restart=always
+Environment="DB_HOST=grocerymate.cp6kci4uaepj.eu-central-1.rds.amazonaws.com"
+Environment="DB_USER=grocerymate_admin"
+Environment="DB_PASS=%31T2mfoPo?4RUbX"
+Environment="DB_NAME=grocerymate"
+Environment="S3_BUCKET_NAME=grocerymate-avatars"
+Environment="S3_REGION=eu-central-1"
+Environment="USE_S3_STORAGE=true"
+
+[Install]
+WantedBy=multi-user.target

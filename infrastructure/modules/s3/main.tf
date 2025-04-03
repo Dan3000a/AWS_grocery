@@ -64,10 +64,36 @@ resource "aws_s3_bucket_versioning" "avatars_versioning" {
 # Security settings for the avatars bucket
 resource "aws_s3_bucket_public_access_block" "avatars_bucket" {
   bucket = aws_s3_bucket.avatars_bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  block_public_acls       = false # Allow ACLs
+  block_public_policy     = false  # Allow public bucket policy
+  ignore_public_acls      = false # Do not ignore ACLs
+  restrict_public_buckets = false  # Allow public access via bucket policy
+}
+
+# Set Object Ownership to "Bucket owner preferred" to allow ACLs
+resource "aws_s3_bucket_ownership_controls" "avatars_bucket_ownership" {
+  bucket = aws_s3_bucket.avatars_bucket.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+# Bucket policy for avatars bucket to allow public read access
+resource "aws_s3_bucket_policy" "avatars_bucket_policy" {
+  bucket = aws_s3_bucket.avatars_bucket.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = "*"
+        Action = "s3:GetObject"
+        Resource = "arn:aws:s3:::${var.avatars_bucket_name}/*"
+      }
+    ]
+  })
 }
 
 # Tags for documentation (optional, for the state bucket)
@@ -76,20 +102,4 @@ locals {
     Name        = var.bucket_name
     Environment = "Production"
   }
-}
-
-# Outputs for all buckets
-output "s3_bucket_arn" {
-  value = data.aws_s3_bucket.existing.arn
-  description = "ARN of the Terraform state bucket"
-}
-
-output "app_bucket_arn" {
-  value = aws_s3_bucket.app_bucket.arn
-  description = "ARN of the app bucket"
-}
-
-output "avatars_bucket_arn" {
-  value = aws_s3_bucket.avatars_bucket.arn
-  description = "ARN of the avatars bucket"
 }

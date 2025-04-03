@@ -44,9 +44,8 @@ module "security_groups" {
   security_group_name   = "example-sg"
   manual_ip             = var.manual_ip
   ssh_cidr              = var.manual_ip == "auto" ? [format("%s/32", data.external.my_ip[0].result.ip)] : [var.manual_ip]
-  http_cidr             = ["0.0.0.0/0"]
   private_cidr          = ["10.0.0.0/16"]
-  alb_security_group_id = module.vpc.alb_security_group_id
+  alb_security_group_id = module.vpc.alb_security_group_id  # Übergibt die ALB-Security-Group-ID
 }
 
 # EC2 module call
@@ -56,7 +55,7 @@ module "ec2" {
   instance_type             = var.instance_type
   key_pair_name             = aws_key_pair.generated.key_name
   instance_name             = var.instance_name
-  security_group            = module.security_groups.security_group_id
+  security_group            = module.security_groups.web_sg_id
   iam_role_name             = module.iam.ec2_role_name
   vpc_id                    = module.vpc.vpc_id
   public_subnets            = module.vpc.public_subnets
@@ -70,7 +69,7 @@ module "rds" {
   db_identifier              = var.db_identifier
   db_arn                     = var.db_arn
   private_subnets            = module.vpc.private_subnets
-  security_group             = module.security_groups.security_group_id
+  security_group             = module.security_groups.web_sg_id
   db_credentials_secret_name = var.db_credentials_secret_name
 }
 
@@ -100,7 +99,7 @@ module "asg" {
   subnet_ids             = var.subnet_ids
   launch_template_id     = var.launch_template_id
   launch_template_version = var.launch_template_version
-  target_group_arn       = module.alb.aws_lb_target_group_grocerymate_tg_arn  # Dynamic ARN
+  target_group_arn       = module.alb.target_group_arn
 }
 
 # Route53 Module

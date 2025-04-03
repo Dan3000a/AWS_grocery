@@ -5,7 +5,9 @@ resource "aws_autoscaling_group" "grocery_asg" {
   max_size            = 4                       # Maximum number of instances allowed
   min_size            = 1                       # Minimum number of instances to maintain
   vpc_zone_identifier = var.subnet_ids          # Private subnet IDs where instances will launch
-  target_group_arns   = [var.target_group_arn]  # Attach ASG to the Application Load Balancer (ALB) target group
+
+  # Attach ASG to the new Application Load Balancer (ALB) target group
+  target_group_arns   = ["arn:aws:elasticloadbalancing:eu-central-1:324037288022:targetgroup/grocerymate-target-group-v2/454a393767f252e7"]
 
   launch_template {
     id      = var.launch_template_id            # Reference the launch template ID from the EC2 module
@@ -13,7 +15,7 @@ resource "aws_autoscaling_group" "grocery_asg" {
   }
 
   # Health check configuration for ELB
-  health_check_type        = "ELB"              # Use Elastic Load Balancer for health checks
+  health_check_type         = "ELB"             # Use Elastic Load Balancer for health checks
   health_check_grace_period = 300               # Grace period (in seconds) before health checks start
 
   # Tag instances launched by the ASG for easy identification

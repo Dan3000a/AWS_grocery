@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import ProductGrid from '../ProductStore/ProductGrid/ProductGrid';
-import ProductHeader from '../ProductStore/ProductHeader/ProductHeader';
+import ProductGrid from './ProductGrid/ProductGrid';
+import ProductHeader from './ProductHeader/ProductHeader';
 import Sidebar from './Sidebar/Sidebar';
 import './ProductStore.css';
 import axios from 'axios';
 import { API_BASE_URL } from '../../config';
 
-const ProductStore = ({ products, isFav, basket, setBasket }) => {
+const ProductStore = ({ products, isFav, basket, setBasket, setCategoryFilter, setPriceFilter }) => {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [priceRanges, setPriceRanges] = useState([]);
@@ -89,23 +89,36 @@ const ProductStore = ({ products, isFav, basket, setBasket }) => {
 
   const filterByCategory = (category) => {
     setResetPage(prev => !prev);
-    const filtered = category ? (isFav ? favProducts : products).filter(product => product.category === category) : (isFav ? favProducts : products);
+    setCategoryFilter(category); // Update category filter in App.js
+    const filtered = category && category !== 'All' ? (isFav ? favProducts : products).filter(product => product.category === category) : (isFav ? favProducts : products);
     setFilteredProducts(filtered);
     setSortOption("Suggested");
   };
 
   const filterByPriceRange = (range) => {
     setResetPage(prev => !prev);
-    const filtered = (isFav ? favProducts : products).filter(product => {
-      if (range === '0€ - 5€') return product.price <= 5;
-      if (range === '5€ - 10€') return product.price > 5 && product.price <= 10;
-      if (range === '10€ - 20€') return product.price > 10 && product.price <= 20;
-      if (range === '20€ - 50€') return product.price > 20 && product.price <= 50;
-      if (range === '50€ - 100€') return product.price > 50 && product.price <= 100;
-      if (range === '100€ - 200€') return product.price > 100 && product.price <= 200;
-      if (range === '200€+') return product.price > 200;
-      return true;
-    });
+    let priceFilter = null;
+    if (range === '0€ - 5€') {
+      priceFilter = { min: 0, max: 5 };
+    } else if (range === '5€ - 10€') {
+      priceFilter = { min: 5, max: 10 };
+    } else if (range === '10€ - 20€') {
+      priceFilter = { min: 10, max: 20 };
+    } else if (range === '20€ - 50€') {
+      priceFilter = { min: 20, max: 50 };
+    } else if (range === '50€ - 100€') {
+      priceFilter = { min: 50, max: 100 };
+    } else if (range === '100€ - 200€') {
+      priceFilter = { min: 100, max: 200 };
+    } else if (range === '200€+') {
+      priceFilter = { min: 200, max: Infinity };
+    }
+    setPriceFilter(priceFilter); // Update price filter in App.js
+    const filtered = priceFilter ? (isFav ? favProducts : products).filter(product => {
+      const min = priceFilter.min || 0;
+      const max = priceFilter.max || Infinity;
+      return product.price >= min && product.price <= max;
+    }) : (isFav ? favProducts : products);
     setFilteredProducts(filtered);
     setSortOption("Suggested");
   };

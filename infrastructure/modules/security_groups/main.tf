@@ -7,24 +7,24 @@ data "external" "my_ip" {
 resource "aws_security_group" "web_sg" {
   name        = var.security_group_name
   description = "Allow inbound HTTP, HTTPS, SSH, and DB traffic"
-  vpc_id      = var.vpc_id  # Ensures the security group is tied to the correct VPC
+  vpc_id      = var.vpc_id
 
-  # Allow HTTP access
+  # Allow HTTP access from ALB
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = var.http_cidr  # More flexible for controlled access
-    description = "Allow HTTP from specified CIDR"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [var.alb_security_group_id]
+    description     = "Allow HTTP from ALB"
   }
 
-  # Allow HTTPS access
+  # Allow HTTPS access from ALB
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = var.http_cidr  # Keeps control over HTTPS access
-    description = "Allow HTTPS from specified CIDR"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [var.alb_security_group_id]
+    description     = "Allow HTTPS from ALB"
   }
 
   # Allow SSH access from your IP
@@ -32,16 +32,16 @@ resource "aws_security_group" "web_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = var.ssh_cidr  # Uses a variable for restricted SSH access
+    cidr_blocks = var.ssh_cidr
     description = "Allow SSH from specified IP"
   }
 
-  # NEW: Allow SSH access from Bastion Security Group
+  # Allow SSH access from Bastion Security Group
   ingress {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.bastion_sg.id]  # Allow SSH from Bastion SG
+    security_groups = [aws_security_group.bastion_sg.id]
     description     = "Allow SSH from Bastion Host"
   }
 
@@ -50,7 +50,7 @@ resource "aws_security_group" "web_sg" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = var.private_cidr  # Uses private subnet CIDR
+    cidr_blocks = var.private_cidr
     description = "Allow RDS access from VPC CIDR"
   }
 
@@ -59,7 +59,7 @@ resource "aws_security_group" "web_sg" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.bastion_sg.id]  # Allow from Bastion SG
+    security_groups = [aws_security_group.bastion_sg.id]
     description     = "Allow RDS access from Bastion"
   }
 
@@ -68,7 +68,7 @@ resource "aws_security_group" "web_sg" {
     from_port       = 8000
     to_port         = 8000
     protocol        = "tcp"
-    security_groups = [var.alb_security_group_id]  # Reference ALB SG
+    security_groups = [var.alb_security_group_id]
     description     = "Allow Gunicorn traffic from ALB"
   }
 
@@ -82,7 +82,7 @@ resource "aws_security_group" "web_sg" {
   }
 
   tags = {
-    Name = "Web Security Group"  # Helps track security groups in AWS
+    Name = "Web Security Group"
   }
 }
 

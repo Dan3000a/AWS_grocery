@@ -22,7 +22,9 @@ const useUserInfo = () => {
         const configData = await response.json();
         setS3Config(configData);
       } else {
-        console.error("Failed to fetch config");
+        console.error(`Failed to fetch config: ${response.status} ${response.statusText}`);
+        const text = await response.text();
+        console.error("Response body:", text);
       }
     } catch (error) {
       console.error("Error fetching config:", error);
@@ -31,10 +33,12 @@ const useUserInfo = () => {
 
   const fetchUserInfo = async () => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
       const response = await fetch(`${API_BASE_URL}/api/me/info`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -43,7 +47,9 @@ const useUserInfo = () => {
         setUsername(data.username);
         setAvatarUrl(data.avatar);
       } else {
-        console.error('Failed to fetch user info');
+        console.error(`Failed to fetch user info: ${response.status} ${response.statusText}`);
+        const text = await response.text();
+        console.error("Response body:", text);
       }
     } catch (error) {
       console.error('Error fetching user info:', error);
@@ -52,18 +58,22 @@ const useUserInfo = () => {
 
   const fetchAllUsers = async () => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
       const response = await fetch(`${API_BASE_URL}/api/me/all-users`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
         const data = await response.json();
-        setUsers(data); // Update the users list
+        setUsers(data);
       } else {
-        console.error('Failed to fetch users');
+        console.error(`Failed to fetch users: ${response.status} ${response.statusText}`);
+        const text = await response.text();
+        console.error("Response body:", text);
       }
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -73,8 +83,7 @@ const useUserInfo = () => {
   const updateAvatarInState = (newAvatar) => {
     const newAvatarUrl = newAvatar;
     setAvatarUrl(newAvatarUrl);
-    
-    // Update the users list locally to reflect the new avatar for the current user
+
     setUsers((prevUsers) =>
       prevUsers.map((user) =>
         user.username === username ? { ...user, avatar: newAvatar } : user
@@ -88,23 +97,28 @@ const useUserInfo = () => {
   }, []);
 
   const getAvatarUrl = (username) => {
-  const user = users.find((user) => user.username === username);
+    const user = users.find((user) => user.username === username);
 
-  if (user && user.avatar) {
-    // User has an avatar, use whatever URL backend provides
-    return user.avatar;  // This is already the proxy URL from backend
-  }
+    if (user && user.avatar) {
+      if (s3Config.USE_S3_STORAGE) {
+        return `https://${s3Config.S3_BUCKET}.s3.${s3Config.S3_REGION}.amazonaws.com/avatars/${user.avatar}`;
+      }
+      return user.avatar;
+    }
 
-  // Default avatar through backend proxy
-  return `${process.env.REACT_APP_BACKEND_SERVER}/api/me/avatar/user_default.png`;
-};
+    if (s3Config.USE_S3_STORAGE) {
+      return `https://${s3Config.S3_BUCKET}.s3.${s3Config.S3_REGION}.amazonaws.com/avatars/user_default.png`;
+    }
+    return `${process.env.REACT_APP_BACKEND_SERVER}/api/me/avatar/user_default.png`;
+  };
+
   return {
     username,
     avatarUrl,
     users,
     getAvatarUrl,
     fetchUserInfo,
-    updateAvatarInState, // This will update the avatar directly
+    updateAvatarInState,
   };
 };
 

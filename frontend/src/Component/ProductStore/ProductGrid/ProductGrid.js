@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import notfound from '../../Assets/no-product-found.png';
 import ProductGridSkeleton from '../../Skeleton/ProductGridSkeleton';
 import { toast, Toaster } from 'react-hot-toast';
-import AgeVerificationModal from '../../AgeVerification/AgeVerificationModal'; // Import the modal component
+import AgeVerificationModal from '../../AgeVerification/AgeVerificationModal';
 import { API_BASE_URL } from '../../../config';
 
 const ProductGrid = ({ products, isFav, basket, setBasket, filterByCategory, resetPage }) => {
@@ -28,16 +28,28 @@ const ProductGrid = ({ products, isFav, basket, setBasket, filterByCategory, res
       if (loading) {
         try {
           const token = localStorage.getItem('token');
-          if (!token) return;
+          if (!token) {
+            setFavProductIds([]);
+            setLoading(false);
+            return;
+          }
           const response = await axios.get(`${API_BASE_URL}/api/me/favorites`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
           });
-          setFavProductIds(response.data.map(product => product.id));
+          // Überprüfe, ob response.data definiert ist und ein Array ist
+          if (response && response.data && Array.isArray(response.data)) {
+            setFavProductIds(response.data.map(product => product.id));
+          } else {
+            console.error('Unexpected response format for favorites:', response ? response.data : 'No response');
+            setFavProductIds([]);
+          }
           setLoading(false);
         } catch (error) {
-          console.error('Failed to fetch favorites:', error);
+          console.error('Failed to fetch favorites:', error.response ? error.response.data : error.message);
+          setFavProductIds([]);
+          setLoading(false);
         }
       }
     };
@@ -53,7 +65,7 @@ const ProductGrid = ({ products, isFav, basket, setBasket, filterByCategory, res
         });
         setBasket(response.data);
       } catch (error) {
-        console.error('Failed to fetch basket:', error);
+        console.error('Failed to fetch basket:', error.response ? error.response.data : error.message);
       }
     };
 
@@ -69,6 +81,7 @@ const ProductGrid = ({ products, isFav, basket, setBasket, filterByCategory, res
     if (products.length > 0) {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [products]);
 
   const handlePageChange = (page) => {
@@ -169,8 +182,8 @@ const ProductGrid = ({ products, isFav, basket, setBasket, filterByCategory, res
   };
 
   // Filter products based on user age verification and underage status
-  const filteredProducts = (userAgeVerified && !underage) 
-    ? products 
+  const filteredProducts = (userAgeVerified && !underage)
+    ? products
     : products.filter(product => !product.is_alcohol);
 
   // Recalculate total pages based on filtered products
@@ -211,7 +224,7 @@ const ProductGrid = ({ products, isFav, basket, setBasket, filterByCategory, res
           </div>
         ) : currentProducts.length > 0 ? (
           currentProducts.map(product => (
-            <div 
+            <div
             className="product-card"
             key={product.id}
             >
@@ -219,7 +232,7 @@ const ProductGrid = ({ products, isFav, basket, setBasket, filterByCategory, res
                 <div className="card-header" onClick={() => handleProductClick(product.id)}>
                   <p className="lead">{product.name}</p>
                 </div>
-                <img 
+                <img
                   src={product.image_url}
                   alt={product.name}
                   className="card-img-top"

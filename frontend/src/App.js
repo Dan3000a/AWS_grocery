@@ -1,102 +1,37 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import Home from './Component/Home/Home';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import Auth from './Component/Auth/Auth';
-import ProductStore from './Component/ProductStore/ProductStore';
-import Header from './Component/Header/Header';
-import Navbar from './Component/Navbar/Navbar';
-import Footer from './Component/Footer/Footer';
-import Checkout from './Component/Checkout/Checkout';
-import axios from 'axios';
-import ProtectedRoute from './Component/ProtectedRoute';
-import ProductDetail from './Component/ProductDetail/ProductDetail';
+import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from './config';
-
-
-
-const AppContent = ({ products, isFav, basket, setBasket }) => {
-  const location = useLocation();
-  const hideHeaderRoutes = ['/auth']; // Add any routes where you don't want to show the header
-
-  return (
-    <>
-      {!hideHeaderRoutes.includes(location.pathname) && (
-        <>
-          <Header products={products} />
-          <Navbar />
-        </>
-      )}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/store" element={<ProductStore products={products} isFav={false} basket={basket} setBasket={setBasket} />} />
-        <Route
-          path="/store/favs"
-          element={
-            <ProtectedRoute>
-              <ProductStore products={products} isFav={true} basket={basket} setBasket={setBasket} />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/product/:productId" element={<ProductDetail />} />
-        <Route
-          path="/checkout"
-          element={
-            <ProtectedRoute>
-              <Checkout products={products} basket={basket} setBasket={setBasket} />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-      {!hideHeaderRoutes.includes(location.pathname) && <Footer />}
-    </>
-  );
-};
+import ProductStore from './Component/ProductStore/ProductStore';
 
 function App() {
   const [products, setProducts] = useState([]);
-  const [basket, setBasket] = useState([]);
+  const [categoryFilter, setCategoryFilter] = useState('All');
+  const [priceFilter, setPriceFilter] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/products/all_products`);
-        setProducts(response.data);
+        console.log('Fetching products without params');
+        const response = await fetch(`${API_BASE_URL}/api/products/all_products_products`);
+        const data = await response.json();
+        console.log('Products fetched:', data);
+        setProducts(data);
       } catch (error) {
-        console.error(error);
-      }
-    };
-
-    const fetchBasket = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_BASE_URL}/api/me/basket`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        console.log("Basket data", response.data);
-        setBasket(response.data);
-      } catch (error) {
-        console.error('Failed to fetch basket:', error);
+        console.error('Failed to fetch products:', error);
+        setProducts([]);
       }
     };
 
     fetchProducts();
-    fetchBasket();
-    AOS.init();
-    AOS.refresh();
-  }, []);
+  }, []); // Remove categoryFilter and priceFilter from dependencies
 
   return (
-    <Router>
-      <div className='App'>
-        <AppContent products={products} basket={basket} setBasket={setBasket} />
-      </div>
-    </Router>
+    <div>
+      <ProductStore
+        products={products}
+        setCategoryFilter={setCategoryFilter}
+        setPriceFilter={setPriceFilter}
+      />
+    </div>
   );
 }
 

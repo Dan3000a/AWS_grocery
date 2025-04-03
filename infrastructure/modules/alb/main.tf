@@ -12,19 +12,16 @@ resource "aws_lb" "grocerymate_alb" {
 
 # Define the Target Group for forwarding traffic
 resource "aws_lb_target_group" "grocerymate_tg" {
-  name     = "grocerymate-target-group"
-  port     = 8000
+  name     = "grocerymate-target-group-v2"  # Changed to a unique name
+  port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   health_check {
-    path                = "/health"
+    path                = "/api/health"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
-  }
-  lifecycle {
-    create_before_destroy = true
   }
 }
 

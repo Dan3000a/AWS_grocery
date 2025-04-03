@@ -108,7 +108,10 @@ resource "aws_iam_policy" "s3_avatars_policy" {
           "s3:PutObject",
           "s3:GetObject",
           "s3:ListBucket",
-          "s3:GetBucketLocation"  # Should be present
+          "s3:GetBucketLocation",
+          "s3:GetBucketPolicy",
+          "s3:PutBucketPolicy",
+          "s3:PutObjectAcl"
         ]
         Resource = [
           "arn:aws:s3:::grocerymate-avatars",

@@ -39,4 +39,22 @@ infrastructure/aws-auth.sh
 
 # Ignore GroceryMateDocs READMEs
 infrastructure/GroceryMateDocs/
-infrastructure/aws-auth.sh
+
+# IDE files
+.idea/
+
+# Backup files
+*~
+
+# Binary/Generated files
+*.tar.gz
+AWSCLIV2.pkg
+
+# Terraform lock files
+.terraform.lock.hcl
+
+# Local configuration
+infrastructure/terraform.tfvars.bak
+infrastructure/launch-template-data.json
+change-dns.json
+infrastructure/change-dns.json

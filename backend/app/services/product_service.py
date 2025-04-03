@@ -3,7 +3,6 @@ from flask import current_app
 from typing import List, Dict
 from ..models.product_model import Review, Product
 
-
 def get_all_products() -> List[Dict]:
     """
     Retrieves all products from the database.
@@ -37,7 +36,6 @@ def get_product_by_id(product_id: int) -> Dict:
         return product.to_dict()
     current_app.logger.warning(f"Product with ID {product_id} not found.")
     return {}
-
 
 def add_review_to_product(product_id: int, review_data: Dict) -> Dict:
     """
@@ -77,7 +75,6 @@ def add_review_to_product(product_id: int, review_data: Dict) -> Dict:
     current_app.logger.info(f"New review added for product {product_id} by {review_data['author']}.")
     return {"message": "Review added successfully"}
 
-
 def remove_review_from_product(product_id: int, author_name: str) -> Dict:
     review = Review.query.filter_by(product_id=product_id, author=author_name).first()
 
@@ -89,7 +86,6 @@ def remove_review_from_product(product_id: int, author_name: str) -> Dict:
 
     current_app.logger.warning(f"Review by {author_name} for product {product_id} not found.")
     return {"error": "Review not found"}
-
 
 def update_product_review(product_id: int, author_name: str, updated_data: Dict) -> Dict:
     review = Review.query.filter_by(product_id=product_id, author=author_name).first()

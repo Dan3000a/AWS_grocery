@@ -11,15 +11,18 @@ output "public_subnet_id" {
 
 # Output list of private subnet IDs
 output "private_subnets" {
-  value = aws_subnet.private[*].id
+  description = "List of private subnet IDs"
+  value       = aws_subnet.private[*].id
 }
 
 # Output list of public subnet IDs
 output "public_subnets" {
-  value = aws_subnet.public[*].id
+  description = "List of public subnet IDs"
+  value       = aws_subnet.public[*].id
 }
 
 # Output ALB security group ID
 output "alb_security_group_id" {
-  value = aws_security_group.alb_sg.id
+  description = "The ID of the ALB Security Group"
+  value       = aws_security_group.alb_sg.id
 }
